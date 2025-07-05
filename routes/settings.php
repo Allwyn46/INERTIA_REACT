@@ -20,6 +20,11 @@ Route::middleware('auth')->group(function () {
     Route::post('settings/users', [UserController::class, 'createuser'])->name('users.create');
     Route::patch('settings/users', [UserController::class, 'update'])->name('users.update');
     Route::delete('settings/users', [UserController::class, 'destroy'])->name('users.destroy');
+    
+    Route::get('settings/products', [UserController::class, 'edit'])->name('products.edit');
+    Route::post('settings/products', [UserController::class, 'createuser'])->name('products.create');
+    Route::patch('settings/products', [UserController::class, 'update'])->name('products.update');
+    Route::delete('settings/products', [UserController::class, 'destroy'])->name('products.destroy');
 
     Route::get('settings/appearance', function () {
         return Inertia::render('settings/appearance');
