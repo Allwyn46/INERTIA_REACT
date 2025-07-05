@@ -32,6 +32,11 @@ Route::middleware('guest')->group(function () {
 
     Route::post('reset-password', [NewPasswordController::class, 'store'])
         ->name('password.store');
+
+    Route::get('sign-up', [RegisteredUserController::class, 'signup'])
+        ->name('signup');
+        
+    Route::post('organizationsignup', [RegisteredUserController::class, 'signupstore'])->name('organizationsignup');
 });
 
 Route::middleware('auth')->group(function () {
