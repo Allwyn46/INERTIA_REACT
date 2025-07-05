@@ -14,6 +14,7 @@ import type { PageProps } from '@inertiajs/core';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 import { FormEventHandler } from 'react';
+import { toast } from 'sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -35,27 +36,44 @@ type RegisterForm = {
     email: string;
     phone_number: string;
     user_role: string;
+    assigned_to: string;
     password: string;
     password_confirmation: string;
 };
 
 export default function Users() {
     // *FETCHING USERS FROM BACKEND
-    const { users } = usePage<Props>().props;
+    const { auth, users, managerusers, teamleaderusers, teammemberusers } = usePage<Props>().props;
 
     const { data, setData, post, processing, errors, reset } = useForm<Required<RegisterForm>>({
         name: '',
         email: '',
         phone_number: '',
         user_role: '',
+        assigned_to: '',
         password: '',
         password_confirmation: '',
     });
 
+    let rawUsers: UserType[] | UserType | undefined = [];
+
+    if (data.user_role === 'ORGANIZATION_MANAGER') {
+        rawUsers = managerusers;
+    } else if (data.user_role === 'ORGANIZATION_TEAM_LEADER') {
+        rawUsers = teamleaderusers || 'No Users Found';
+    } else if (data.user_role === 'ORGANIZATION_STAFF') {
+        rawUsers = teammemberusers || 'No Users Found';
+    }
+
+    const usersToShow = Array.isArray(rawUsers) ? rawUsers : rawUsers ? [rawUsers] : [];
+
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        post(route('register'), {
-            onFinish: () => reset('password', 'password_confirmation'),
+        post(route('users.create'), {
+            onFinish: () => {
+                reset('password', 'password_confirmation', 'name', 'assigned_to', 'email', 'phone_number', 'user_role');
+                toast.success('User created successfully!');
+            },
         });
     };
 
@@ -134,7 +152,27 @@ export default function Users() {
                                             </SelectGroup>
                                         </SelectContent>
                                     </Select>
-                                    <InputError message={errors.email} />
+                                    <InputError message={errors.user_role} />
+                                </div>
+
+                                <div className="grid gap-2">
+                                    <Label htmlFor="user_role">Assigned To</Label>
+                                    <Select value={data.assigned_to} onValueChange={(value) => setData('assigned_to', value)}>
+                                        <SelectTrigger className="w-[180px]">
+                                            <SelectValue placeholder="Select Assigned To" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                <SelectLabel>Assigned To</SelectLabel>
+                                                {usersToShow.map((user: UserType) => (
+                                                    <SelectItem key={user.id} value={user.id.toString()}>
+                                                        {user.name}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+                                    <InputError message={errors.assigned_to} />
                                 </div>
 
                                 <div className="grid gap-2">

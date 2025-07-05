@@ -17,6 +17,7 @@ Route::middleware('auth')->group(function () {
     Route::put('settings/password', [PasswordController::class, 'update'])->name('password.update');
 
     Route::get('settings/users', [UserController::class, 'edit'])->name('users.edit');
+    Route::post('settings/users', [UserController::class, 'createuser'])->name('users.create');
     Route::patch('settings/users', [UserController::class, 'update'])->name('users.update');
     Route::delete('settings/users', [UserController::class, 'destroy'])->name('users.destroy');
 
